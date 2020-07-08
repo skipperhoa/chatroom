@@ -45,15 +45,10 @@ conn.connect(function (err) {
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 var jsonParser = bodyParser.json();
 /* Init config */
-var connect = false;
 var arrayColors =['#C0392B','#7DCEA0','#138D75','#F1C40F','#7D3C98','#A04000','#186A3B','#E371C4','#08E3CF','#AEE308'];
-var numberFor = 0;
-var page = 1;
-var start = 0;
-var limit = 5;
 var dataResults = [];
 /*luu session */
-var dataSession = {}
+
 /**set router */
 /*GET*/
 getLoadMoreCommnet = function(start,limit){
@@ -71,9 +66,8 @@ app.get('/', (req, res) => {
         return res.redirect("/dang-nhap");
     }
     var dataUser = req.session.User;
-    dataSession = dataUser;
     //console.log(dataSession)
-    var sql = "select comments.bodyCmt,comments.dateCmt,users.Email,users.FullName,users.Color from users, comments where users.idUser=comments.idUser order by dateCmt desc limit 0,"+limit;
+    var sql = "select comments.bodyCmt,comments.dateCmt,users.Email,users.FullName,users.Color from users, comments where users.idUser=comments.idUser order by dateCmt desc limit 0,5";
    
     conn.all(sql, function (error, results) {
         if (error) {
@@ -84,12 +78,13 @@ app.get('/', (req, res) => {
                // dataResults.push(results[0]);
                // numberFor++;
            // }
-           if(!connect){
-               updateState(1,dataSession.Timestamp,dataSession.idUser);
-           }
+         
+          // if(!connect){
+             //  updateState(1,dataUser.Timestamp,dataUser.idUser);
+          // }
            var  paginations =""
             if(results.length>0){
-                paginations = "<li id='afterComment'><button  id='LoadMore' style='width:100px;margin:0 auto;display:block;' data-page='2' data-limit='"+limit+"'>Load more</button></li>";
+                paginations = "<li id='afterComment'><button  id='LoadMore' style='width:100px;margin:0 auto;display:block;' data-page='2' data-limit='5'>Load more</button></li>";
           
             }
             results = results.reverse();
@@ -184,45 +179,22 @@ app.get('/dang-xuat', (req, res) => {
 var httpServer = http.createServer(app);
 //var httpsServer = https.createServer(credentials, app);
 var io = require('socket.io')(httpServer);
-var arraySocketId = []
-var CheckF5 = true;
-
-var time_tam = 0;
-var dulieu = "";
+var connect = false;
 io.on('connection', (socket) => {
-   // console.log(dataResults)
-   // console.log("connect socket id new:"+socket.id)
+    var idUserOnline;
     connect = true;
-   /* if(!CheckF5){
-        var Timestamp = Date.now().toString();
-        updateState(1,Timestamp,dataSession.idUser);
-        _time = getTimeOnline(time_tam);
-        socket.broadcast.emit("UseClose",{idUser:dataSession.idUser,State:1,_time:_time})
-       // console.log("đã mở socket id:"+socket.id);
-        CheckF5=true;
-    }*/
-    var allUser = {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-        "idUser":dataSession.idUser,
-        "SocketId":socket.id,
-        "State":1,
-        "Timestamp":dataSession.Timestamp
-    }
-    arraySocketId.push(allUser);
-    var socketArray = {
-        socketId: socket.id,
-        fullname: dataSession.fullname,
-        KyTuName: dataSession.KyTuName,
-        idUser:dataSession.State
-    }
-    socket.broadcast.emit('broadcast', socketArray);
-    //console.log(socketArray)
+    var numberFor = 0;
+    var page = 1;
+    var start = 0;
+    var limit = 5;
     socket.on("listUser",function(msg){
-        conn.all("select * from users where idUser not in('"+dataSession.idUser+"')", function (error, results, fields) {
+        idUserOnline = msg.idUser;
+        conn.all("select * from users where idUser not in('"+msg.idUser+"')", function (error, results, fields) {
             if (error) {
                 console.log("Thêm không thành công");
             }
             else {
-
+                
                 var str="";
                 results.forEach(function(rows){
                     FullName = rows.FullName.split(" ");
@@ -236,8 +208,8 @@ io.on('connection', (socket) => {
                 });
                 var data = {
                     "str":str,
-                    "idUser":dataSession.idUser,
-                    "State":dataSession.State,
+                    "idUser":msg.idUser,
+                    "State":msg.State,
                     "socketId":socket.id
                 }
               
@@ -248,47 +220,47 @@ io.on('connection', (socket) => {
     socket.on('chatgroup', (msg) => {
         
         let date_ob = new Date();
-
+    
         // adjust 0 before single digit date
         let date = ("0" + date_ob.getDate()).slice(-2);
-
+    
         // current month
         let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
-
+    
         // current year
         let year = date_ob.getFullYear();
-
+    
         // current hours
         let hours = date_ob.getHours();
-
+    
         // current minutes
         let minutes = date_ob.getMinutes();
-
+    
         // current seconds
         let seconds = date_ob.getSeconds();
         var dateCmt = year + "-" + month + "-" + date + " " + hours + ":" + minutes;
         var dataCmt = {
-            "email": dataSession.userEmail,
-            "fullname": dataSession.fullname,
+            "email": msg.data.userEmail,
+            "fullname": msg.data.fullname,
             "bodyCmt": msg.bodyCmt,
-            "idUser": dataSession.idUser,
+            "idUser": msg.data.idUser,
             "dateCmt": dateCmt,
-            "KyTuName": dataSession.KyTuName
+            "KyTuName": msg.data.KyTuName
         };
-
-        var sql = "insert into comments(bodyCmt,dateCmt,idUser) values('" + msg.bodyCmt + "','" + dateCmt + "'," + dataSession.idUser + ")";
+       console.log(dataCmt)
+        var sql = "insert into comments(bodyCmt,dateCmt,idUser) values('" + msg.bodyCmt + "','" + dateCmt + "'," + msg.data.idUser + ")";
         conn.all(sql, function (error, results, fields) {
             if (error) {
                 console.log("Thêm không thành công");
             }
             else {
                 io.emit('chatgroup', dataCmt);
-
+    
             }
-
+    
         });
-
-    }); 
+    
+    });
     socket.on("SearchChat",function(msg){
         console.log(msg)
         var sql = "select comments.bodyCmt,comments.dateCmt,users.Email,users.FullName,users.Color from users, comments where users.idUser=comments.idUser And bodyCmt like '%"+msg.TextSearch+"%' order by idCmt desc";
@@ -336,22 +308,18 @@ io.on('connection', (socket) => {
        
     });
     socket.on('disconnect', function() {
-        //CheckF5=false;
         connect=false;
+        
         setTimeout(function(){
             if(!connect){
                 var Timestamp = Date.now().toString();
-                time_tam = Timestamp;
-                updateState(0,Timestamp,dataSession.idUser);
-                _time = getTimeOnline(dataSession.Timestamp);
-               
-                socket.broadcast.emit("UseClose",{idUser:dataSession.idUser,State:0,_time:_time})
+                updateState(0,Timestamp,idUserOnline);
+                _time = getTimeOnline(Timestamp);
+                socket.broadcast.emit("UseClose",{idUser:idUserOnline,State:0,_time:_time})
+              
             }
         },1000);
-       // console.log(dataSession.idUser)
-       // console.log("đã đóng socket id:"+socket.id);
     });
-    
 });
 getTimeOnline = function (_timestamp) {
     var _state = "";

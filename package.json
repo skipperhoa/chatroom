@@ -6,8 +6,9 @@
     "node": "12.16.0"
   },
   "main": "app.js",
+  
   "scripts": {
-    "test": "chatgroup"
+      "start": "node app.js"
   },
   "keywords": [
     "chatgroup"

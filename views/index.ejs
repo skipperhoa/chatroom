@@ -134,6 +134,15 @@
     $(function () {
         var start = 0;
         var offetSet = 0;
+        var listUser = {
+            "fullname": "<%=dataUser.fullname%>",
+            "userEmail": "<%=dataUser.userEmail%>",
+            "idUser": "<%=dataUser.idUser%>",
+            "KyTuName": "<%=dataUser.KyTuName%>",
+            "Timestamp": "<%=dataUser.Timestamp%>",
+            "State": "<%=dataUser.State%>"
+        }
+        console.log(listUser)
         var scrollBottom = function () {
             var height = $(".addComment")[0].scrollHeight;
             $(".listBox nav").animate({
@@ -154,8 +163,10 @@
         editor.on('key', function (event) {
             if (event.data.keyCode == 13) {
                 var value = CKEDITOR.instances['NoiDung'].getData();
+                var idUser = $("#UserSocketId").attr('data-user-id');
                 var dataJson = {
-                    "bodyCmt": value
+                    "bodyCmt": value,
+                    "data": listUser
                 }
                 CKEDITOR.instances.NoiDung.setData('');
                 socket.emit('chatgroup', dataJson);
@@ -168,45 +179,7 @@
             socketId = $("#UserSocketId").attr("data-socket-id");
             socket.emit("LoadMore", { page: page, limit: limit, socketId: socketId });
         });
-        socket.emit("listUser", "listUser")
-        socket.on("dataPaginations", function (msg) {
-            var htmlChuoi = ""
-            var data = msg.dataResults;
-            var dataLoadMore = data.reverse(); 
-            console.log(msg)
-            // console.log(dataLoadMore.length)
-            for (var i = 0; i < dataLoadMore.length; i++) {
-                if (dataLoadMore[i].length > 0) {
-                    for (var k = 0; k < dataLoadMore[i].length; k++) {
-                        const event = new Date(dataLoadMore[i][k].dateCmt);
-                        const date = event.getFullYear() + "-" + event.getMonth() + "-" + event.getDate();
-                        const time = event.toLocaleTimeString('it-IT')
-                        var arrayKyTu = dataLoadMore[i][k].FullName.split(" ");
-                        var KyTu = arrayKyTu[arrayKyTu.length - 1].substring(0, 1);
-                        // console.log(dataLoadMore[i][k].dateCmt);
-                        htmlChuoi += "<li>";
-                        htmlChuoi += "<div class=\"contentUser\">";
-                        htmlChuoi += "<span class=\"KyTu\">";
-                        htmlChuoi += "<label>" + KyTu + "</label>";
-                        htmlChuoi += "</span>";
-                        htmlChuoi += "<a  class=\"linkUser\">" + dataLoadMore[i][k].Email + "</a>";
-                        htmlChuoi += dataLoadMore[i][k].bodyCmt;
-                        htmlChuoi += "</div>";
-                        htmlChuoi += "<div class=\"timePost\">";
-                        htmlChuoi += "<span>" + date + " " + time + "</span>";
-                        htmlChuoi += "</div>";
-                        htmlChuoi += "</li>";
-                    }
-                }
-            }
-            var setPage = parseInt(msg.page) + 1;
-            console.log(setPage)
-            $("#LoadMore").attr('data-page', setPage);
-            $("#LoadMore").attr('data-limit', msg.limit);
-            $("#afterComment").after(htmlChuoi);
-
-            SyntaxHighlighter.highlight();
-        })
+        socket.emit("listUser", listUser)
         socket.on("listUser", function (msg) {
             $("#UserSocketId").attr("data-socket-id", msg.socketId);
             if ($("#listUserLogin li").length > 0) {
@@ -228,7 +201,7 @@
         });
         socket.on('chatgroup', function (msg) {
             var date = msg.dateCmt;
-            console.log(date);
+            //   console.log(msg);
             var chuoi = '<li><div class="contentUser"><span class="KyTu"><label>' + msg.KyTuName + '</label></span><a hef="" class="linkUser">[' + msg.fullname + ']</a>';
             chuoi += msg.bodyCmt;
             chuoi += '</div><div class="timePost"><span>' + date + '</span></div></li>';
@@ -271,11 +244,11 @@
                 socket.emit("SearchChat", dataSearch);
             }
         }
-        $(".showSearchChat").click(function(){
+        $(".showSearchChat").click(function () {
             $(".box-search").show();
         });
         $(".box-search").hide();
-        $(".close").click(function(){
+        $(".close").click(function () {
             $(".box-search").hide();
         });
         $('#searchChat').bind("enterKey", function (e) {
@@ -296,15 +269,54 @@
                 const time2 = event2.toLocaleTimeString('it-IT')
                 var arrayKyTu2 = dataResults[n].FullName.split(" ");
                 var KyTu2 = arrayKyTu2[arrayKyTu2.length - 1].substring(0, 1);
-                strChat += '<li><div class="contentUser"><span class="KyTu" style="background-color:'+dataResults[n].Color+'"><label>' + KyTu2 + '</label></span><a hef="" class="linkUser">[' + dataResults[n].FullName + ']</a>';
+                strChat += '<li><div class="contentUser"><span class="KyTu" style="background-color:' + dataResults[n].Color + '"><label>' + KyTu2 + '</label></span><a hef="" class="linkUser">[' + dataResults[n].FullName + ']</a>';
                 strChat += dataResults[n].bodyCmt;
                 strChat += '</div><div class="timePost"><span>' + date2 + " " + time2 + '</span></div></li>';
             };
-          //  console.log(strChat)
+            //  console.log(strChat)
             $(".loadChat").html(strChat)
-           // scrollBottom();
+            // scrollBottom();
             SyntaxHighlighter.highlight();
         });
+        socket.on("dataPaginations", function (msg) {
+            var htmlChuoi = ""
+            var data = msg.dataResults;
+            var dataLoadMore = data.reverse(); 
+            console.log(msg)
+            // console.log(dataLoadMore.length)
+            for (var i = 0; i < dataLoadMore.length; i++) {
+                if (dataLoadMore[i].length > 0) {
+                    for (var k = 0; k < dataLoadMore[i].length; k++) {
+                        const event = new Date(dataLoadMore[i][k].dateCmt);
+                        const date = event.getFullYear() + "-" + event.getMonth() + "-" + event.getDate();
+                        const time = event.toLocaleTimeString('it-IT')
+                        var arrayKyTu = dataLoadMore[i][k].FullName.split(" ");
+                        var KyTu = arrayKyTu[arrayKyTu.length - 1].substring(0, 1);
+                        // console.log(dataLoadMore[i][k].dateCmt);
+                        htmlChuoi += "<li>";
+                        htmlChuoi += "<div class=\"contentUser\">";
+                        htmlChuoi += "<span class=\"KyTu\">";
+                        htmlChuoi += "<label>" + KyTu + "</label>";
+                        htmlChuoi += "</span>";
+                        htmlChuoi += "<a  class=\"linkUser\">" + dataLoadMore[i][k].Email + "</a>";
+                        htmlChuoi += dataLoadMore[i][k].bodyCmt;
+                        htmlChuoi += "</div>";
+                        htmlChuoi += "<div class=\"timePost\">";
+                        htmlChuoi += "<span>" + date + " " + time + "</span>";
+                        htmlChuoi += "</div>";
+                        htmlChuoi += "</li>";
+                    }
+                }
+            }
+            var setPage = parseInt(msg.page) + 1;
+            console.log(setPage)
+            $("#LoadMore").attr('data-page', setPage);
+            $("#LoadMore").attr('data-limit', msg.limit);
+            $("#afterComment").after(htmlChuoi);
+
+            SyntaxHighlighter.highlight();
+        })
+
 
 
     });
