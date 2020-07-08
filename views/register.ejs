@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    
+</head>
+<body>
+    <%- include('header',{dataUser}); %>
+    <form action="/dang-ky" method="POST">
+        <div class="form-dangnhap">
+            <h2>Đăng ký Chat Group</h2>
+            <div class="box-ten">
+                <label for="">Full Name</label>
+                <input type="text" name="fullname" id="fullname" placeholder="Full Name" />
+            </div>
+            <div class="box-ten">
+                <label for="">Email</label>
+                <input type="text" name="email" id="email" placeholder="Email" />
+            </div>
+            <div class="box-ten">
+                <label for="">Password</label>
+                <input type="password" name="password" id="pass" placeholder="Password" />
+            </div>
+            <div class="box-ten">
+               <button class="login">Đăng ký</button>
+            </div>
+        </div>
+    </form>
+    
+</body>
+</html>

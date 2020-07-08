@@ -1,0 +1,401 @@
+* {
+  margin: 0;
+  padding: 0; }
+
+body {
+  width: 100%;
+  max-width: 1350px;
+  font-family: 'Roboto';
+  font-weight: normal;
+  background: url("../images/background-nen.png") center no-repeat;
+  background-size: 100%; }
+
+header {
+  top: 0;
+  background: #acc0ed;
+  position: fixed;
+  width: 100%; }
+  header .top {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0px auto; }
+    header .top span {
+      display: block;
+      width: 100%;
+      padding: 10px 0px;
+      color: #fff;
+      text-align: right; }
+      header .top span a {
+        text-decoration: none;
+        color: #fff;
+        font-size: 12px; }
+
+.chatRoom {
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  background-color: #dde5ef;
+  margin-top: 38px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap; }
+
+.boxChat {
+  width: 900px;
+  border: 1px solid #dde5ef;
+  background-color: #dde5ef;
+  padding: 5px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  overflow: hidden; }
+
+.titleGroup {
+  color: #000;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  font-size: 18px;
+  padding: 10px 0px;
+  position: relative; }
+  .titleGroup a {
+    color: #fff;
+    font-size: 12px; }
+  .titleGroup button {
+    border: none;
+    padding: 4px;
+    border-radius: 15px;
+    font-size: 12px;
+    display: block;
+    width: 80px;
+    position: absolute;
+    right: 0;
+    color: #ffff;
+    background: #ff8f00;
+    outline: none;
+    cursor: pointer; }
+
+.listBox {
+  width: 100%;
+  padding: 5px;
+  background-color: #fff; }
+  .listBox nav {
+    height: 300px;
+    overflow-y: scroll; }
+    .listBox nav ul li {
+      width: 100%;
+      list-style: none;
+      padding-bottom: 10px; }
+      .listBox nav ul li .contentUser {
+        width: 85%;
+        display: inline-block; }
+        .listBox nav ul li .contentUser .linkUser {
+          color: #2196F3;
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 12px;
+          padding-left: 3px; }
+        .listBox nav ul li .contentUser .KyTu {
+          width: 25px;
+          height: 25px;
+          display: inline-block;
+          background-color: #ff8f00;
+          color: #ffe57f;
+          text-align: center;
+          border-radius: 13px;
+          line-height: 25px;
+          vertical-align: middle; }
+          .listBox nav ul li .contentUser .KyTu label {
+            width: 100%; }
+          .listBox nav ul li .contentUser .KyTu img {
+            width: 100%; }
+        .listBox nav ul li .contentUser p {
+          display: inline;
+          line-height: 20px;
+          font-size: 13px; }
+      .listBox nav ul li .timePost {
+        width: calc(100% - 85%);
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        float: right;
+        text-align: right;
+        -webkit-box-pack: end;
+        -ms-flex-pack: end;
+        justify-content: flex-end; }
+        .listBox nav ul li .timePost span {
+          display: block;
+          width: 200px;
+          text-align: right;
+          padding: 3px;
+          -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+          background: #ececec;
+          text-align: center;
+          border-radius: 5px;
+          font-size: 12px;
+          font-weight: bold; }
+
+.form-dangnhap {
+  width: 100%;
+  max-width: 500px;
+  margin: 0px auto;
+  margin-top: 100px; }
+  .form-dangnhap h2 {
+    font-weight: normal;
+    text-align: center; }
+  .form-dangnhap .box-ten {
+    width: 100%; }
+    .form-dangnhap .box-ten label {
+      color: #00cacb;
+      display: block;
+      padding: 2px;
+      width: 100%;
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box; }
+    .form-dangnhap .box-ten input {
+      width: 100%;
+      padding: 8px;
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box; }
+    .form-dangnhap .box-ten button {
+      widows: 100%;
+      padding: 8px;
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+      border: none;
+      background: #00cacb;
+      width: 100%;
+      color: #fff;
+      margin-top: 2px; }
+
+.enterSubmit {
+  padding: 10px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+  background: #7c7faf;
+  color: #fff;
+  cursor: pointer;
+  border: none;
+  font-size: 15px;
+  font-weight: bold;
+  float: right; }
+
+.listUser {
+  width: calc(100% - 900px);
+  background-color: #eef3f7; }
+  .listUser h2 {
+    font-size: 18px;
+    padding: 10px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    background-color: #eef3f7;
+    color: #000; }
+  .listUser ul {
+    padding-left: 10px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box; }
+    .listUser ul li {
+      list-style: none;
+      color: #fff;
+      padding: 10px 0px;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center; }
+      .listUser ul li i {
+        width: 25px;
+        height: 25px;
+        border-radius: 15px;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        font-style: normal;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center; }
+        .listUser ul li i.online1 {
+          background: green; }
+        .listUser ul li i.online0 {
+          background: #7c7faf; }
+      .listUser ul li span {
+        font-size: 14px;
+        color: #000;
+        display: inline-block;
+        padding-left: 10px;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box; }
+        .listUser ul li span label {
+          font-size: 9px;
+          color: green;
+          padding-top: 7px;
+          display: block; }
+
+.thongbao_show {
+  width: 167px;
+  text-align: center;
+  padding: 10px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  color: #fff;
+  background: #7c7faf;
+  border-radius: 100px;
+  position: fixed;
+  top: 0;
+  right: -200px;
+  -webkit-transition: all .5s;
+  -o-transition: all .5s;
+  transition: all .5s; }
+
+.active {
+  right: 0; }
+
+pre {
+  background: #ccc;
+  width: 100%;
+  padding: 10px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+
+.profile {
+  width: 100%;
+  padding: 10px;
+  background: #fff;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+  .profile .infoProfile {
+    width: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center; }
+    .profile .infoProfile span {
+      width: 60px;
+      height: 60px;
+      display: block; }
+      .profile .infoProfile span img {
+        width: 100%; }
+    .profile .infoProfile a {
+      width: calc(100% - 70px);
+      display: block;
+      margin-left: 10px; }
+
+.box-search {
+  width: 900px;
+  margin: auto;
+  padding: 20px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  position: fixed;
+  top: 86px;
+  left: 0;
+  right: 0;
+  background: #fff;
+  -webkit-box-shadow: 1px 1px 10px #cccc;
+  box-shadow: 1px 1px 10px #cccc; }
+  .box-search .content-search {
+    width: 100%; }
+    .box-search .content-search .btnClose {
+      width: 100%;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      position: relative;
+      margin-bottom: 10px; }
+      .box-search .content-search .btnClose input {
+        padding: 0px 5px;
+        margin: 0;
+        height: 32px;
+        border: none;
+        -webkit-box-shadow: 0px 0px 1px #acc0ed;
+        box-shadow: 0px 0px 1px #acc0ed;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        width: 210px; }
+      .box-search .content-search .btnClose span.close {
+        width: 48px;
+        position: absolute;
+        right: 0;
+        display: block;
+        padding: 10px;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        display: block;
+        background: red;
+        text-align: center;
+        font-size: 11px;
+        color: #fff;
+        margin-bottom: 10px;
+        cursor: pointer; }
+    .box-search .content-search nav {
+      height: 300px;
+      overflow-y: scroll; }
+      .box-search .content-search nav ul li {
+        width: 100%;
+        list-style: none;
+        padding-bottom: 10px; }
+        .box-search .content-search nav ul li .contentUser {
+          width: 85%;
+          display: inline-block; }
+          .box-search .content-search nav ul li .contentUser .linkUser {
+            color: #2196F3;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 12px;
+            padding-left: 3px; }
+          .box-search .content-search nav ul li .contentUser .KyTu {
+            width: 25px;
+            height: 25px;
+            display: inline-block;
+            background-color: #ff8f00;
+            color: #ffe57f;
+            text-align: center;
+            border-radius: 13px;
+            line-height: 25px;
+            vertical-align: middle; }
+            .box-search .content-search nav ul li .contentUser .KyTu label {
+              width: 100%; }
+            .box-search .content-search nav ul li .contentUser .KyTu img {
+              width: 100%; }
+          .box-search .content-search nav ul li .contentUser p {
+            display: inline;
+            line-height: 20px;
+            font-size: 13px; }
+        .box-search .content-search nav ul li .timePost {
+          width: calc(100% - 85%);
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex;
+          float: right;
+          text-align: right;
+          -webkit-box-pack: end;
+          -ms-flex-pack: end;
+          justify-content: flex-end; }
+          .box-search .content-search nav ul li .timePost span {
+            display: block;
+            width: 200px;
+            text-align: right;
+            padding: 3px;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            background: #ececec;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold; }

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+</head>
+
+<body>
+    <%- include('header', {dataUser}); %>
+    <div class="chatRoom">
+        <div class="boxChat">
+            <h2 class="titleGroup">Chat Group<a href="https://hoanguyenit.com"> - hoanguyenit.com</a><button class="showSearchChat">Seach
+                    chat</button></h2>
+            <div class="listBox">
+                <nav>
+                    <ul class="addComment">
+                        <%-paginations%>
+
+                        <%results.forEach(function(rows){%>
+                        <%
+                        FullName = rows.FullName;
+                        KyTuName = FullName.split(" ");
+                        rows.FullName = KyTuName[KyTuName.length-1].substring(0,1);
+                      
+                      %>
+                        <li>
+                            <div class="contentUser">
+                                <span class="KyTu" style="background-color:<%=rows.Color%>">
+                                    <label><%=rows.FullName%></label>
+                                </span>
+                                <a hef="" class="linkUser">[<%=FullName%>]</a>
+                                <%-rows.bodyCmt%>
+                            </div>
+                            <div class="timePost">
+                                <span><%=moment(rows.dateCmt).format('YYYY-MM-DD HH:mm'); %></span>
+                            </div>
+                        </li>
+                        <% })%>
+
+                    </ul>
+                </nav>
+
+            </div>
+            <div class="boxComment">
+                <input type="hidden" class="idUser" value="<%=dataUser.userEmail%>" />
+                <textarea name="NoiDung" id="NoiDung" class="editor" cols="45" rows="15"></textarea>
+                <!-- <button class="enterSubmit">Gửi</button> -->
+            </div>
+        </div>
+        <div class="listUser">
+            <div class="profile">
+                <div class="infoProfile">
+                    <span>
+                        <img src="/images/avatar.png" />
+                    </span>
+                    <a><%=dataUser.fullname%></a>
+                </div>
+            </div>
+            <h2>Danh sách Group</h2>
+            <ul id="listUserLogin">
+
+            </ul>
+        </div>
+    </div>
+    <div class="thongbao_show">
+        <label>Thành viên mới vừa đăng nhập</label>
+    </div>
+
+    <div class="box-search">
+        <div class="content-search">
+            <div class="btnClose">
+                <input type="text" name="searchChat" id="searchChat" placeholder="Search...!" />
+                <span class="close">Close</span>
+            </div>
+            <nav>
+                <ul class="loadChat">
+                   
+                </ul>
+            </nav>
+        </div>
+    </div>
+</body>
+
+<script src="/ckeditor/ckeditor.js"></script>
+<script type="text/javascript">
+    var editor = CKEDITOR.replace('NoiDung', {
+        // enterMode: CKEDITOR.ENTER_DIV,
+        // Pressing Shift+Enter will create a new <p> element.
+
+        shiftEnterMode: CKEDITOR.ENTER_P,
+        //filebrowserImageBrowseUrl : 'ckfinder/ckfinder.html?Type=Images',
+        //filebrowserFlashBrowseUrl : 'ckfinder/ckfinder.html?Type=Flash',
+        //filebrowserImageUploadUrl : 'ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images',
+        //filebrowserFlashUploadUrl : 'ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Flash',
+        height: '120px',
+        toolbar: [
+
+
+            { name: 'links', items: ['Link', 'Unlink', 'Anchor'] },
+            { name: 'insert', items: ['Image', 'MediaEmbed', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe'] },
+            '/',
+            { name: 'styles', items: ['Styles', 'Format', 'Font', 'FontSize'] },
+            { name: 'colors', items: ['TextColor', 'BGColor'] },
+            { name: 'tools', items: ['Maximize', 'ShowBlocks', '-', 'About'] },
+            { name: 'syntaxhighlight', items: ['Syntaxhighlight'] }
+        ]
+    });
+</script>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="/ckeditor/plugins/syntaxhighlight/Scripts/shCore.js"></script>
+<script src="/ckeditor/plugins/syntaxhighlight/Scripts/shBrushAS3.js"></script>
+<script src="/ckeditor/plugins/syntaxhighlight/Scripts/shBrushCSharp.js"></script>
+<script src="/ckeditor/plugins/syntaxhighlight/Scripts/shBrushCss.js"></script>
+<script src="/ckeditor/plugins/syntaxhighlight/Scripts/shBrushJScript.js"></script>
+<script src="/ckeditor/plugins/syntaxhighlight/Scripts/shBrushPhp.js"></script>
+<script src="/ckeditor/plugins/syntaxhighlight/Scripts/shBrushPython.js"></script>
+<script src="/ckeditor/plugins/syntaxhighlight/Scripts/shBrushRuby.js"></script>
+<script src="/ckeditor/plugins/syntaxhighlight/Scripts/shBrushXml.js"></script>
+<link rel="stylesheet" href="/ckeditor/plugins/syntaxhighlight/Styles/shCore.css" />
+<link rel="stylesheet" href="/ckeditor/plugins/syntaxhighlight/Styles/shThemeDefault.css" />
+<script type="application/javascript">
+    $(document).ready(function () {
+
+        SyntaxHighlighter.highlight();
+    });
+</script>
+<script>
+    $(function () {
+        var start = 0;
+        var offetSet = 0;
+        var scrollBottom = function () {
+            var height = $(".addComment")[0].scrollHeight;
+            $(".listBox nav").animate({
+                scrollTop: height
+            }, 300, function () {
+                //alert("done");
+            });
+        }
+        scrollBottom();
+        var socket = io.connect();
+        $('.enterSubmit').click(function () {
+            var value = CKEDITOR.instances['NoiDung'].getData();
+            var dataJson = {
+                "bodyCmt": value
+            }
+            socket.emit('chatgroup', dataJson);
+        });
+        editor.on('key', function (event) {
+            if (event.data.keyCode == 13) {
+                var value = CKEDITOR.instances['NoiDung'].getData();
+                var dataJson = {
+                    "bodyCmt": value
+                }
+                CKEDITOR.instances.NoiDung.setData('');
+                socket.emit('chatgroup', dataJson);
+
+            }
+        });
+        $("#LoadMore").click(function () {
+            page = $(this).attr('data-page');
+            limit = $(this).attr('data-limit');
+            socketId = $("#UserSocketId").attr("data-socket-id");
+            socket.emit("LoadMore", { page: page, limit: limit, socketId: socketId });
+        });
+        socket.emit("listUser", "listUser")
+        socket.on("dataPaginations", function (msg) {
+            var htmlChuoi = ""
+            var data = msg.dataResults;
+            var dataLoadMore = data.reverse(); 
+            console.log(msg)
+            // console.log(dataLoadMore.length)
+            for (var i = 0; i < dataLoadMore.length; i++) {
+                if (dataLoadMore[i].length > 0) {
+                    for (var k = 0; k < dataLoadMore[i].length; k++) {
+                        const event = new Date(dataLoadMore[i][k].dateCmt);
+                        const date = event.getFullYear() + "-" + event.getMonth() + "-" + event.getDate();
+                        const time = event.toLocaleTimeString('it-IT')
+                        var arrayKyTu = dataLoadMore[i][k].FullName.split(" ");
+                        var KyTu = arrayKyTu[arrayKyTu.length - 1].substring(0, 1);
+                        // console.log(dataLoadMore[i][k].dateCmt);
+                        htmlChuoi += "<li>";
+                        htmlChuoi += "<div class=\"contentUser\">";
+                        htmlChuoi += "<span class=\"KyTu\">";
+                        htmlChuoi += "<label>" + KyTu + "</label>";
+                        htmlChuoi += "</span>";
+                        htmlChuoi += "<a  class=\"linkUser\">" + dataLoadMore[i][k].Email + "</a>";
+                        htmlChuoi += dataLoadMore[i][k].bodyCmt;
+                        htmlChuoi += "</div>";
+                        htmlChuoi += "<div class=\"timePost\">";
+                        htmlChuoi += "<span>" + date + " " + time + "</span>";
+                        htmlChuoi += "</div>";
+                        htmlChuoi += "</li>";
+                    }
+                }
+            }
+            var setPage = parseInt(msg.page) + 1;
+            console.log(setPage)
+            $("#LoadMore").attr('data-page', setPage);
+            $("#LoadMore").attr('data-limit', msg.limit);
+            $("#afterComment").after(htmlChuoi);
+
+            SyntaxHighlighter.highlight();
+        })
+        socket.on("listUser", function (msg) {
+            $("#UserSocketId").attr("data-socket-id", msg.socketId);
+            if ($("#listUserLogin li").length > 0) {
+                $("#listUserLogin li").each(function (index, value) {
+                    var id = $(this).attr("data-id");
+                    if (msg.idUser == id) {
+                        $(this).attr("data-id", msg.idUser);
+                        $(this).find("i").removeClass("online1");
+                        $(this).find("i").removeClass("online0");
+                        $(this).find("i").addClass("online1");
+                        $(this).find("i").attr("data-state", msg.State);
+                        $(this).find("span label").text("Đang online");
+                    }
+                });
+            } else {
+                $('#listUserLogin').append(msg.str);
+            }
+
+        });
+        socket.on('chatgroup', function (msg) {
+            var date = msg.dateCmt;
+            console.log(date);
+            var chuoi = '<li><div class="contentUser"><span class="KyTu"><label>' + msg.KyTuName + '</label></span><a hef="" class="linkUser">[' + msg.fullname + ']</a>';
+            chuoi += msg.bodyCmt;
+            chuoi += '</div><div class="timePost"><span>' + date + '</span></div></li>';
+            $(".addComment").append(chuoi);
+            scrollBottom();
+            SyntaxHighlighter.highlight();
+
+
+        });
+        socket.on('broadcast', function (msg) {
+            //$(".thongbao_show").addClass("active");
+            //var dom = "<li data-id='"+msg.idUser+"'><i class='online"+msg.State+"' data-state='"+msg.State+"'>"+msg.KyTuName+"</i><span>"+msg.fullname+"</span></li>";
+            //$('#listUserLogin').append(dom);
+            //setTimeout(function(){ $(".thongbao_show").removeClass("active");},3000);
+        });
+        socket.on('UseClose', function (msg) {
+            if (msg.State == 0) {
+                $("#listUserLogin li[data-id=" + msg.idUser + "] i").removeClass('online1');
+                $("#listUserLogin li[data-id=" + msg.idUser + "] i").addClass('online0');
+                $("#listUserLogin li[data-id=" + msg.idUser + "] i.online0").attr("data-state", 0);
+                $("#listUserLogin li[data-id=" + msg.idUser + "]").find("span label").text("(" + msg._time + ")");
+            }
+            else {
+                $("#listUserLogin li[data-id=" + msg.idUser + "] i").removeClass('online0');
+                $("#listUserLogin li[data-id=" + msg.idUser + "] i").addClass('online1');
+                $("#listUserLogin li[data-id=" + msg.idUser + "] i.online1").attr("date-state", 1);
+                $("#listUserLogin li[data-id=" + msg.idUser + "]").find("span label").text("(Đang online)");
+            }
+        });
+        /*Search Chat*/
+        var SearchChat = function () {
+            var txtSearch = $("#searchChat").val().trim();
+            if (txtSearch != "") {
+                var idUserSocket = $("#UserSocketId").attr('data-socket-id');
+                dataSearch = {
+                    "socketId": idUserSocket,
+                    "TextSearch": txtSearch
+                }
+                console.log("co")
+                socket.emit("SearchChat", dataSearch);
+            }
+        }
+        $(".showSearchChat").click(function(){
+            $(".box-search").show();
+        });
+        $(".box-search").hide();
+        $(".close").click(function(){
+            $(".box-search").hide();
+        });
+        $('#searchChat').bind("enterKey", function (e) {
+            SearchChat();
+        });
+        $('#searchChat').keyup(function (e) {
+            if (e.keyCode == 13) {
+                $(this).trigger("enterKey");
+            }
+        });
+        socket.on("SearchChat", function (msg) {
+            var strChat = "";
+            console.log(msg);
+            var dataResults = msg.dataResults
+            for (var n = 0; n < dataResults.length; n++) {
+                const event2 = new Date(dataResults[n].dateCmt);
+                const date2 = event2.getFullYear() + "-" + event2.getMonth() + "-" + event2.getDate();
+                const time2 = event2.toLocaleTimeString('it-IT')
+                var arrayKyTu2 = dataResults[n].FullName.split(" ");
+                var KyTu2 = arrayKyTu2[arrayKyTu2.length - 1].substring(0, 1);
+                strChat += '<li><div class="contentUser"><span class="KyTu" style="background-color:'+dataResults[n].Color+'"><label>' + KyTu2 + '</label></span><a hef="" class="linkUser">[' + dataResults[n].FullName + ']</a>';
+                strChat += dataResults[n].bodyCmt;
+                strChat += '</div><div class="timePost"><span>' + date2 + " " + time2 + '</span></div></li>';
+            };
+          //  console.log(strChat)
+            $(".loadChat").html(strChat)
+           // scrollBottom();
+            SyntaxHighlighter.highlight();
+        });
+
+
+    });
+</script>
+
+</html>

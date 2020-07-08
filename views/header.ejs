@@ -1,0 +1,22 @@
+<header>
+    <div class="top">
+        <%
+            var check = false;
+            if(dataUser){
+                check = true; 
+            }
+
+        %>
+        <span>
+            <% if(!check){%>
+                <a href="/">Home</a> / 
+                <a href="/dang-nhap">Đăng nhập</a> / 
+                <a href="/dang-ky">Đăng ký</a> /
+            <% }%>
+            <% if(check){%>
+                <a href="/" id="UserSocketId">Chào : <%=dataUser.userEmail%></a> / 
+                <a href="/dang-xuat">Đăng xuất</a>
+            <% }%>
+        </span>
+    </div>
+</header>

@@ -1,0 +1,25 @@
+{
+  "name": "chatgroup",
+  "version": "1.0.0",
+  "description": "skipperhoa",
+  "main": "app.js",
+  "scripts": {
+    "test": "chatgroup"
+  },
+  "keywords": [
+    "chatgroup"
+  ],
+  "author": "skipperhoa",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "ejs": "^3.1.3",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "md5": "^2.2.1",
+    "moment": "^2.27.0",
+    "mysql": "^2.18.1",
+    "socket.io": "^2.3.0",
+    "sqlite3": "^5.0.0"
+  }
+}
