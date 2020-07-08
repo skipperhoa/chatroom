@@ -2,6 +2,9 @@
   "name": "chatgroup",
   "version": "1.0.0",
   "description": "skipperhoa",
+  "engines": {
+    "node": "12.16.0"
+  },
   "main": "app.js",
   "scripts": {
     "test": "chatgroup"
@@ -11,9 +14,7 @@
   ],
   "author": "skipperhoa",
   "license": "ISC",
-  "engines": {
-    "node": "12.16.0"
-  },
+ 
   "dependencies": {
     "body-parser": "^1.19.0",
     "ejs": "^3.1.3",
