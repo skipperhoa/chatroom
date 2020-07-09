@@ -13,7 +13,8 @@
     <%- include('header', {dataUser}); %>
     <div class="chatRoom">
         <div class="boxChat">
-            <h2 class="titleGroup">Chat Group<a href="https://hoanguyenit.com"> - hoanguyenit.com</a><button class="showSearchChat">Seach
+            <h2 class="titleGroup">Chat Group<a href="https://hoanguyenit.com"> - hoanguyenit.com</a><button
+                    class="showSearchChat">Seach
                     chat</button></h2>
             <div class="listBox">
                 <nav>
@@ -36,7 +37,7 @@
                                 <%-rows.bodyCmt%>
                             </div>
                             <div class="timePost">
-                                <span><%=moment(rows.dateCmt).format('YYYY-MM-DD HH:mm'); %></span>
+                                <span><%=rows.dateCmt %></span>
                             </div>
                         </li>
                         <% })%>
@@ -78,7 +79,7 @@
             </div>
             <nav>
                 <ul class="loadChat">
-                   
+
                 </ul>
             </nav>
         </div>
@@ -137,10 +138,11 @@
         var listUser = {
             "fullname": "<%=dataUser.fullname%>",
             "userEmail": "<%=dataUser.userEmail%>",
-            "idUser": "<%=dataUser.idUser%>",
+            "idUser": <%=dataUser.idUser %>,
             "KyTuName": "<%=dataUser.KyTuName%>",
             "Timestamp": "<%=dataUser.Timestamp%>",
-            "State": "<%=dataUser.State%>"
+            "State": "<%=dataUser.State%>",
+            "Color": "<%=dataUser.Color%>"
         }
         console.log(listUser)
         var scrollBottom = function () {
@@ -152,6 +154,8 @@
             });
         }
         scrollBottom();
+        //   var socket = io.connect("http://localhost:8000",{
+        //'sync disconnect on unload': true });
         var socket = io.connect();
         $('.enterSubmit').click(function () {
             var value = CKEDITOR.instances['NoiDung'].getData();
@@ -179,13 +183,15 @@
             socketId = $("#UserSocketId").attr("data-socket-id");
             socket.emit("LoadMore", { page: page, limit: limit, socketId: socketId });
         });
-        socket.emit("listUser", listUser)
-        socket.on("listUser", function (msg) {
-            $("#UserSocketId").attr("data-socket-id", msg.socketId);
+        socket.emit("checkUserOnline", listUser)
+        socket.on("checkUserOnline", function (results) {
+            var msg = results.data;
             if ($("#listUserLogin li").length > 0) {
+                var i  = false;
                 $("#listUserLogin li").each(function (index, value) {
                     var id = $(this).attr("data-id");
                     if (msg.idUser == id) {
+                        i = true;
                         $(this).attr("data-id", msg.idUser);
                         $(this).find("i").removeClass("online1");
                         $(this).find("i").removeClass("online0");
@@ -194,15 +200,39 @@
                         $(this).find("span label").text("Đang online");
                     }
                 });
+                if(!i){
+                    $('#listUserLogin').append(results.str);
+                }
             } else {
-                $('#listUserLogin').append(msg.str);
+                $('#listUserLogin').append(results.str);
             }
+        });
+        socket.emit("listUser", listUser)
+        socket.on("listUser", function (msg) {
+            $("#UserSocketId").attr("data-socket-id", msg.socketId);
+            /*   if ($("#listUserLogin li").length > 0) {
+                   $("#listUserLogin li").each(function (index, value) {
+                       var id = $(this).attr("data-id");
+                       if (msg.idUser == id) {
+                           $(this).attr("data-id", msg.idUser);
+                           $(this).find("i").removeClass("online1");
+                           $(this).find("i").removeClass("online0");
+                           $(this).find("i").addClass("online1");
+                           $(this).find("i").attr("data-state", msg.State);
+                           $(this).find("span label").text("Đang online");
+                       }
+                   });
+               } else {
+                   */
+            $('#listUserLogin').append(msg.str);
+            // }
 
         });
         socket.on('chatgroup', function (msg) {
             var date = msg.dateCmt;
             //   console.log(msg);
-            var chuoi = '<li><div class="contentUser"><span class="KyTu"><label>' + msg.KyTuName + '</label></span><a hef="" class="linkUser">[' + msg.fullname + ']</a>';
+            var background = 'style=background-color:' + msg.Color;
+            var chuoi = '<li><div class="contentUser"><span class="KyTu" ' + background + '><label>' + msg.KyTuName + '</label></span><a hef="" class="linkUser">[' + msg.fullname + ']</a>';
             chuoi += msg.bodyCmt;
             chuoi += '</div><div class="timePost"><span>' + date + '</span></div></li>';
             $(".addComment").append(chuoi);
@@ -281,7 +311,7 @@
         socket.on("dataPaginations", function (msg) {
             var htmlChuoi = ""
             var data = msg.dataResults;
-            var dataLoadMore = data.reverse(); 
+            var dataLoadMore = data.reverse();
             console.log(msg)
             // console.log(dataLoadMore.length)
             for (var i = 0; i < dataLoadMore.length; i++) {
@@ -317,6 +347,29 @@
             SyntaxHighlighter.highlight();
         })
 
+        /*Event F5*/
+        //  window.onbeforeunload = function() {
+        //      socket.emit("EventF5",listUser);
+        //           return "Bạn muốn load page?";
+        //   }
+        /* document.onkeydown = fkey;
+        document.onkeypress = fkey
+        document.onkeyup = fkey;
+        var wasPressed = false;
+        function fkey(e){
+                e = e || window.event;
+            if( wasPressed ) return; 
+
+                if (e.keyCode == 116) {
+                   // alert("f5 pressed");
+                    wasPressed = true;
+                   // socket.emit("EventF5",listUser);
+                }else {
+                    alert("Window closed");
+                    socket.emit("EventF5",listUser);
+                }
+        }*/
+        /*END*/
 
 
     });

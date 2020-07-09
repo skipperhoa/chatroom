@@ -17,7 +17,7 @@ let conn = new sqlite3.Database("./data.db", err => {
 const session = require('express-session');
 var moment = require('moment');
 const { count } = require('console');
-const { emit } = require('process');
+const { emit, cwd } = require('process');
 const httpPort = 8000;
 const httpsPort = 8001;
 var app = express()
@@ -80,7 +80,7 @@ app.get('/', (req, res) => {
            // }
          
           // if(!connect){
-             //  updateState(1,dataUser.Timestamp,dataUser.idUser);
+            updateState(1,dataUser.Timestamp,dataUser.idUser);
           // }
            var  paginations =""
             if(results.length>0){
@@ -105,7 +105,7 @@ app.get('/dang-nhap', (req, res) => {
 app.post('/dang-nhap', urlencodedParser, function (req, res) {
     var email = req.body.email;
     var pass = md5(req.body.password);
-    var sql = "select idUser,FullName,count(*) as Total from users where Email='" + email + "' and Password='" + pass + "'";
+    var sql = "select idUser,FullName,Color,count(*) as Total from users where Email='" + email + "' and Password='" + pass + "'";
     conn.all(sql, function (error, results) {
         if (error) {
             res.redirect('/dang-nhap');
@@ -124,7 +124,8 @@ app.post('/dang-nhap', urlencodedParser, function (req, res) {
                     idUser: results[0].idUser,
                     KyTuName: KyTuName,
                     Timestamp:Timestamp,
-                    State:1
+                    State:1,
+                    Color: results[0].Color
                 }
                 updateState(1,Timestamp,results[0].idUser);
                 return res.redirect("/");
@@ -169,6 +170,9 @@ app.post('/dang-ky', urlencodedParser, function (req, res) {
 
 /* đăng xuất */
 app.get('/dang-xuat', (req, res) => {
+    var Timestamp = Date.now().toString();
+    var dataOut = req.session.User;
+    updateState(0,Timestamp,dataOut.idUser);
     req.session.destroy(function (err) {
         return res.redirect('/dang-nhap');
     })
@@ -179,16 +183,29 @@ app.get('/dang-xuat', (req, res) => {
 var httpServer = http.createServer(app);
 //var httpsServer = https.createServer(credentials, app);
 var io = require('socket.io')(httpServer);
+var ArraySocketID = []
 var connect = false;
 io.on('connection', (socket) => {
-    var idUserOnline;
+    //var req = socket.request;
+    //console.log(req)
     connect = true;
-    var numberFor = 0;
+    console.log("socket mới:"+socket.id)
     var page = 1;
     var start = 0;
     var limit = 5;
+    socket.on("checkUserOnline",function(msg){
+        var str = "<li data-id='"+msg.idUser+"'><i class='online"+msg.State+"' data-state='"+msg.State+"'>"+msg.KyTuName+"</i><span>"+msg.fullname+"<label>(Đang online)"+"</label></span></li>";
+        var _check = {
+            "str" : str,
+            "data":msg
+        }
+        socket.broadcast.emit("checkUserOnline",_check)
+    });
     socket.on("listUser",function(msg){
-        idUserOnline = msg.idUser;
+        ArraySocketID.push({
+            "SocketID":socket.id,
+            "data":msg
+        })
         conn.all("select * from users where idUser not in('"+msg.idUser+"')", function (error, results, fields) {
             if (error) {
                 console.log("Thêm không thành công");
@@ -213,7 +230,8 @@ io.on('connection', (socket) => {
                     "socketId":socket.id
                 }
               
-                io.emit('listUser', data);
+               io.to(socket.id).emit('listUser', data);
+               
             }
         });
     });
@@ -245,9 +263,10 @@ io.on('connection', (socket) => {
             "bodyCmt": msg.bodyCmt,
             "idUser": msg.data.idUser,
             "dateCmt": dateCmt,
-            "KyTuName": msg.data.KyTuName
+            "KyTuName": msg.data.KyTuName,
+            "Color":msg.data.Color
         };
-       console.log(dataCmt)
+      // console.log(dataCmt)
         var sql = "insert into comments(bodyCmt,dateCmt,idUser) values('" + msg.bodyCmt + "','" + dateCmt + "'," + msg.data.idUser + ")";
         conn.all(sql, function (error, results, fields) {
             if (error) {
@@ -307,16 +326,31 @@ io.on('connection', (socket) => {
         });
        
     });
-    socket.on('disconnect', function() {
+    socket.on('disconnect', function(msg) {
+        var socketID_old = socket.id; 
+        console.log("socket cu:"+socket.id) 
         connect=false;
-        
         setTimeout(function(){
             if(!connect){
-                var Timestamp = Date.now().toString();
-                updateState(0,Timestamp,idUserOnline);
-                _time = getTimeOnline(Timestamp);
-                socket.broadcast.emit("UseClose",{idUser:idUserOnline,State:0,_time:_time})
-              
+                ArraySocketID.filter(function(value){
+                    if(value.SocketID==socketID_old){
+                         console.log("đã đóng xong")
+                        var Timestamp = Date.now().toString();
+                        _time = getTimeOnline(Timestamp);
+                        updateState(0,Timestamp,value.data.idUser);
+                        socket.broadcast.emit("UseClose",{idUser:value.data.idUser,State:0,_time:_time})
+                        connect=true;
+                        ArraySocketID = ArraySocketID.filter(function(item){
+                            return item.SocketID!=socketID_old
+                        });
+                    }
+                }) 
+            }else{
+                console.log("đã xóa socket củ:"+socketID_old)
+                ArraySocketID = ArraySocketID.filter(function(value){
+                    return value.SocketID!=socketID_old
+                });
+                console.log(ArraySocketID)
             }
         },1000);
     });
