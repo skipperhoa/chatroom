@@ -245,9 +245,10 @@ header{
             }
 
             span{
+                width: calc(100% - 25px);
+                display: block;
                 font-size: 14px;
                 color: #000;
-                display: inline-block;
                 padding-left: 10px;
                 box-sizing: border-box;
                 label{

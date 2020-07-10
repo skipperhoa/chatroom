@@ -323,9 +323,10 @@
                         var arrayKyTu = dataLoadMore[i][k].FullName.split(" ");
                         var KyTu = arrayKyTu[arrayKyTu.length - 1].substring(0, 1);
                         // console.log(dataLoadMore[i][k].dateCmt);
+                        var background =  "style=background-color:"+dataLoadMore[i][k].Color;
                         htmlChuoi += "<li>";
                         htmlChuoi += "<div class=\"contentUser\">";
-                        htmlChuoi += "<span class=\"KyTu\">";
+                        htmlChuoi += "<span class='KyTu' "+background+">";
                         htmlChuoi += "<label>" + KyTu + "</label>";
                         htmlChuoi += "</span>";
                         htmlChuoi += "<a  class=\"linkUser\">" + dataLoadMore[i][k].Email + "</a>";

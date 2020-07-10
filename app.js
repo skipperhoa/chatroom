@@ -28,9 +28,10 @@ app.use(session({
     resave: true,
     saveUninitialized: true,
     secret: 'skipperhoa',
-    cookie: { maxAge: 900000 }
+    cookie: {maxAge: 900000}
 }));
-/**connect mysql */
+
+/**connect mysql**/
 /*var conn = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -41,6 +42,7 @@ conn.connect(function (err) {
     if (err) throw err;
     console.log("Connected database!!!")
 });*/
+
 // create application/x-www-form-urlencoded parser
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 var jsonParser = bodyParser.json();
@@ -48,7 +50,6 @@ var jsonParser = bodyParser.json();
 var arrayColors =['#C0392B','#7DCEA0','#138D75','#F1C40F','#7D3C98','#A04000','#186A3B','#E371C4','#08E3CF','#AEE308'];
 var dataResults = [];
 /*luu session */
-
 /**set router */
 /*GET*/
 getLoadMoreCommnet = function(start,limit){
@@ -61,14 +62,14 @@ getLoadMoreCommnet = function(start,limit){
         }
     });
 }
+
 app.get('/', (req, res) => {
     if (!req.session.User) {
         return res.redirect("/dang-nhap");
     }
     var dataUser = req.session.User;
     //console.log(dataSession)
-    var sql = "select comments.bodyCmt,comments.dateCmt,users.Email,users.FullName,users.Color from users, comments where users.idUser=comments.idUser order by dateCmt desc limit 0,5";
-   
+    var sql = "select comments.bodyCmt,comments.dateCmt,users.Email,users.FullName,users.Color from users, comments where users.idUser=comments.idUser order by idCmt desc limit 0,5";
     conn.all(sql, function (error, results) {
         if (error) {
             throw error;
@@ -82,7 +83,7 @@ app.get('/', (req, res) => {
           // if(!connect){
             updateState(1,dataUser.Timestamp,dataUser.idUser);
           // }
-           var  paginations =""
+            var  paginations =""
             if(results.length>0){
                 paginations = "<li id='afterComment'><button  id='LoadMore' style='width:100px;margin:0 auto;display:block;' data-page='2' data-limit='5'>Load more</button></li>";
           
@@ -91,7 +92,6 @@ app.get('/', (req, res) => {
             return res.render('index', { dataUser, results, moment,paginations});
         }
     });
-
 });
 
 app.get('/dang-nhap', (req, res) => {
@@ -134,8 +134,8 @@ app.post('/dang-nhap', urlencodedParser, function (req, res) {
         }
 
     });
+});
 
-})
 /*Update trạng thái và thời gian online*/
 updateState = function(State,Timestamp,idUser){
      conn.all("Update users Set `State`='"+State+"',`Timestamp`='"+Timestamp+"' Where idUser='"+idUser+"'",function(err,res,fields){
@@ -143,6 +143,7 @@ updateState = function(State,Timestamp,idUser){
         console.log("update state='"+State+"',Timestamp:"+Timestamp) 
      });
 }
+
 /*đăng ký*/
 app.get('/dang-ky', (req, res) => {
     if (req.session.User) {
@@ -178,7 +179,6 @@ app.get('/dang-xuat', (req, res) => {
     })
 });
 
-
 /**set server */
 var httpServer = http.createServer(app);
 //var httpsServer = https.createServer(credentials, app);
@@ -193,6 +193,7 @@ io.on('connection', (socket) => {
     var page = 1;
     var start = 0;
     var limit = 5;
+
     socket.on("checkUserOnline",function(msg){
         var str = "<li data-id='"+msg.idUser+"'><i class='online"+msg.State+"' data-state='"+msg.State+"'>"+msg.KyTuName+"</i><span>"+msg.fullname+"<label>(Đang online)"+"</label></span></li>";
         var _check = {
@@ -268,6 +269,7 @@ io.on('connection', (socket) => {
         };
       // console.log(dataCmt)
         var sql = "insert into comments(bodyCmt,dateCmt,idUser) values('" + msg.bodyCmt + "','" + dateCmt + "'," + msg.data.idUser + ")";
+      //  console.log(sql)
         conn.all(sql, function (error, results, fields) {
             if (error) {
                 console.log("Thêm không thành công");
@@ -354,6 +356,7 @@ io.on('connection', (socket) => {
             }
         },1000);
     });
+
 });
 getTimeOnline = function (_timestamp) {
     var _state = "";
